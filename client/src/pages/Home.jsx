@@ -66,8 +66,9 @@ const Home = () => {
           const existingHistory = JSON.parse(sessionStorage.getItem("vinHistory")) || [];
           const updatedHistory = [data, ...existingHistory.filter((item) => item.vin !== data.vin)];
           sessionStorage.setItem("vinHistory", JSON.stringify(updatedHistory));
-        } catch (e) {
+        } catch (err) {
           sessionStorage.setItem("vinHistory", JSON.stringify([data]));
+          console.log(err);
         }
       }
     } catch (err) {
