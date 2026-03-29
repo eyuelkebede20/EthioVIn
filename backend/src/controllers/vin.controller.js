@@ -1,5 +1,7 @@
-const { fetchFromNHTSA, parseNHTSAData } = require("../services/nhtsa.js");
-const { fetchFromGemini } = require("../services/gemini.js");
+const { fetchFromNHTSA, parseNHTSAData } = require("../services/nhtsa");
+const { fetchFromGemini } = require("../services/gemini");
+const Guest = require("../models/Guest");
+const jwt = require("jsonwebtoken");
 
 const decodeVIN = async (req, res) => {
   const { vin, region } = req.body;
@@ -8,10 +10,43 @@ const decodeVIN = async (req, res) => {
     return res.status(400).json({ error: "VIN and region are required." });
   }
 
+  // 1. Check if user is authenticated
+  let isAuthenticated = false;
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      jwt.verify(token, process.env.JWT_SECRET);
+      isAuthenticated = true;
+    } catch (error) {
+      // Token is invalid or expired, treat as guest
+      isAuthenticated = false;
+    }
+  }
+
+  // 2. Enforce 10-search limit for guests
+  if (!isAuthenticated) {
+    const ip = req.ip || req.connection.remoteAddress;
+    let guest = await Guest.findOne({ ipAddress: ip });
+
+    if (guest) {
+      if (guest.searchCount >= 10) {
+        return res.status(403).json({
+          error: "Free search limit reached. Please sign up to continue using the AI decoder.",
+          requireSignup: true,
+        });
+      }
+      guest.searchCount += 1;
+      guest.lastSearch = Date.now();
+      await guest.save();
+    } else {
+      await Guest.create({ ipAddress: ip });
+    }
+  }
+
+  // 3. Decoding Logic
   try {
     let nhtsaContext = "";
 
-    // 1. Fetch from NHTSA if ASEAN
     if (region === "asean") {
       try {
         const nhtsaRaw = await fetchFromNHTSA(vin);
@@ -37,15 +72,11 @@ const decodeVIN = async (req, res) => {
       }
     }
 
-    // 2. Build the Gemini Prompt
-    const basePrompt = `Act as a professional automotive VIN decoder specializing in Ethiopian imports. Decode this ${region.toUpperCase()} VIN/Chassis Number: ${vin}. Estimate the price in ETB for the Ethiopian market based on high import duties and 2026 trends. Return ONLY a JSON object with keys: manufacturer, model, year, body_type, engine_specs, seating_capacity, market_segment, estimated_eth_price_range, confidence_score.`;
+    const basePrompt = `Act as a professional automotive VIN decoder specializing in Ethiopian imports. Decode this ${region.toUpperCase()} VIN/Chassis Number: ${vin}. Estimate the price in ETB for the Ethiopian market based on high import duties and 2026 trends. Return ONLY a JSON object with keys: vin, manufacturer, model, year, body_type, engine_specs, seating_capacity, market_segment, estimated_eth_price_range, confidence_score. You must include the original vin '${vin}' in the 'vin' field.`;
 
     const finalPrompt = `${basePrompt} ${nhtsaContext}`;
-
-    // 3. Call Gemini with the combined prompt
     const geminiResult = await fetchFromGemini(finalPrompt);
 
-    // 4. Send final JSON to frontend
     res.json(geminiResult);
   } catch (error) {
     console.error("Decoding Error:", error);
