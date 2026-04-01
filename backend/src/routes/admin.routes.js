@@ -1,21 +1,16 @@
 const express = require("express");
 const { protect, authorizeRoles } = require("../middleware/authMiddleware");
+const { createOrganizationAndAdmin, getAllOrganizations } = require("../controllers/superAdmin.controller");
+const { createOfficer, getOfficers } = require("../controllers/subAdmin.controller");
 
 const router = express.Router();
 
-// Super Admin only
-router.get("/super", protect, authorizeRoles("super_admin"), (req, res) => {
-  res.json({ message: "Welcome to the Super Admin Dashboard data" });
-});
+// Super Admin Organization Management
+router.post("/organizations", protect, authorizeRoles("super_admin"), createOrganizationAndAdmin);
+router.get("/organizations", protect, authorizeRoles("super_admin"), getAllOrganizations);
 
-// Insurance (Admin + Officer)
-router.get("/insurance", protect, authorizeRoles("insurance_admin", "insurance_officer", "super_admin"), (req, res) => {
-  res.json({ message: "Welcome to the Insurance Dashboard data" });
-});
-
-// Garage (Admin + Officer)
-router.get("/garage", protect, authorizeRoles("garage_admin", "garage_officer", "super_admin"), (req, res) => {
-  res.json({ message: "Welcome to the Garage Dashboard data" });
-});
+// Sub Admin Officer Management (Handles both Garage and Insurance)
+router.post("/officers", protect, authorizeRoles("garage_admin", "insurance_admin"), createOfficer);
+router.get("/officers", protect, authorizeRoles("garage_admin", "insurance_admin"), getOfficers);
 
 module.exports = router;
