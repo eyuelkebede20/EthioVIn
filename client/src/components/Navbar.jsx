@@ -37,7 +37,7 @@ const Navbar = () => {
   return (
     <nav className="flex justify-between items-center px-8 py-4 bg-white shadow-sm relative z-50">
       <Link to="/" className="text-xl font-bold tracking-tight text-blue-600">
-        ETHIOVIN
+        ETHIO-VIN
       </Link>
 
       <div className="space-x-6 text-sm font-medium flex items-center">

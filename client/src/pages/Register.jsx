@@ -10,9 +10,9 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
-
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(backendUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }), // Default role 'user' assigned by backend

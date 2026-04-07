@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 const SubAdminDashboard = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [officers, setOfficers] = useState([]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,7 +14,7 @@ const SubAdminDashboard = () => {
 
   const fetchOfficers = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/officers", {
+      const res = await fetch(`${backendUrl}/api/admin/officers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -34,7 +35,7 @@ const SubAdminDashboard = () => {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/officers", {
+      const res = await fetch(`{backendUrl}/api/admin/officers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 const SuperAdminDashboard = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   const [organizations, setOrganizations] = useState([]);
   const [orgName, setOrgName] = useState("");
   const [orgType, setOrgType] = useState("garage");
@@ -12,7 +14,7 @@ const SuperAdminDashboard = () => {
 
   const fetchOrganizations = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/organizations", {
+      const res = await fetch(`${backendUrl}/api/admin/organizations`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -33,7 +35,7 @@ const SuperAdminDashboard = () => {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/organizations", {
+      const res = await fetch(`${backendUrl}/api/admin/organizations`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
