@@ -6,6 +6,9 @@ const vinRoutes = require("./routes/vin.routes");
 const authRoutes = require("./routes/auth.routes");
 const adminRoutes = require("./routes/admin.routes");
 const app = express();
+
+app.use(express.json());
+
 app.use(
   cors({
     origin: "https://ethiovin.netlify.app/",
@@ -14,7 +17,6 @@ app.use(
 app.get("/", (req, res) => {
   res.send("API is running 🚀");
 });
-app.use(express.json());
 
 connectDB();
 
