@@ -6,15 +6,13 @@ const vinRoutes = require("./routes/vin.routes");
 const authRoutes = require("./routes/auth.routes");
 const adminRoutes = require("./routes/admin.routes");
 const app = express();
-app.use(cors());
-// Trust proxy is required if you are hosting behind a load balancer (like Vercel/Render) to get the real IP
-app.set("trust proxy", true);
-const corsOptions = {
-  origin: "https://ethiovin.netlify.app/",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-};
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: "https://ethiovin.netlify.app", // Allow only your frontend
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 app.use(express.json());
 
