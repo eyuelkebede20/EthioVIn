@@ -9,7 +9,11 @@ const app = express();
 
 // Trust proxy is required if you are hosting behind a load balancer (like Vercel/Render) to get the real IP
 app.set("trust proxy", true);
-
+const corsOptions = {
+  origin: "https://ethiovin.netlify.app/",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
 app.use(cors());
 app.use(express.json());
 
