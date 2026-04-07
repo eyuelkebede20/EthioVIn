@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 const Register = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -10,9 +12,9 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
     try {
-      const res = await fetch(backendUrl, {
+      const res = await fetch(`${backendUrl}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }), // Default role 'user' assigned by backend

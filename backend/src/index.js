@@ -8,9 +8,7 @@ const adminRoutes = require("./routes/admin.routes");
 const app = express();
 app.use(
   cors({
-    origin: "https://ethiovin.netlify.app", // Allow only your frontend
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: "https://ethiovin.netlify.app/",
   }),
 );
 
