@@ -30,7 +30,7 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200, // Explicitly force 200 for preflight
+  optionsSuccessStatus: 200,
 };
 // 2. Apply Middleware
 // Best practice: Apply CORS before any other routing or body parsing
