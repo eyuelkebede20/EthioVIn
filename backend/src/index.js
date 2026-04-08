@@ -21,10 +21,10 @@ const corsOptions = {
     if (!origin) return callback(null, true);
 
     // ... existing code
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
-      callback(null, false); // Return false instead of an Error
+      callback(null, false);
     }
     // ...
   },
