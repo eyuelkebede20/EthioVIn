@@ -20,12 +20,13 @@ const corsOptions = {
     // Allow requests with no origin (like Postman or curl)
     if (!origin) return callback(null, true);
 
+    // ... existing code
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      // Improved error message to tell you EXACTLY what was blocked
-      callback(new Error(`CORS Error: Origin ${origin} is not allowed`));
+      callback(null, false); // Return false instead of an Error
     }
+    // ...
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
