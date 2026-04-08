@@ -17,22 +17,21 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like Postman or curl)
+    // Allow requests with no origin (like Postman)
     if (!origin) return callback(null, true);
 
-    // ... existing code
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+    if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      // DO NOT return new Error(). It causes a 500 status code.
       callback(null, false);
     }
-    // ...
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 200, // Explicitly force 200 for preflight
 };
-
 // 2. Apply Middleware
 // Best practice: Apply CORS before any other routing or body parsing
 app.use(cors(corsOptions));
