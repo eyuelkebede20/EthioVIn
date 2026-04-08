@@ -5,19 +5,27 @@ const connectDB = require("./config/db");
 const vinRoutes = require("./routes/vin.routes");
 const authRoutes = require("./routes/auth.routes");
 const adminRoutes = require("./routes/admin.routes");
+
 const app = express();
 
-app.use(express.json());
+// 1. Allowed Origins (Strictly NO trailing slashes)
+const allowedOrigins = [
+  "https://ethiovin.senaycreatives.com",
+  "https://ethiovin.netlify.app",
+  "http://localhost:5173", // For local Vite frontend testing
+  "http://localhost:3000", // For other local frontend setups
+];
 
-const allowedOrigins = ["https://ethiovin.senaycreatives.com/", "https://ethiovin.netlify.app/"];
 const corsOptions = {
   origin: function (origin, callback) {
+    // Allow requests with no origin (like Postman or curl)
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true); // The origin is in the allowlist!
+      callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS")); // Block it
+      // Improved error message to tell you EXACTLY what was blocked
+      callback(new Error(`CORS Error: Origin ${origin} is not allowed`));
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -25,17 +33,24 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-// 3. Apply the middleware to your app
+// 2. Apply Middleware
+// Best practice: Apply CORS before any other routing or body parsing
 app.use(cors(corsOptions));
-app.get("/", (req, res) => {
-  res.send("API is running 🚀");
-});
+app.use(express.json());
 
+// 3. Connect to Database
 connectDB();
+
+// 4. Routes
+app.get("/", (req, res) => {
+  res.send("EthioVIN API is running 🚀");
+});
 
 app.use("/api/vin", vinRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 
-const PORT = process.env.PORT;
+// 5. Start Server
+// Added a fallback port (5000) just in case process.env.PORT is undefined
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
