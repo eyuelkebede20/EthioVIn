@@ -6,7 +6,25 @@ on:
       - main
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      client: ${{ steps.filter.outputs.client }}
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            client:
+              - 'client/**'
+            backend:
+              - 'backend/**'
+
   build-and-deploy-client:
+    needs: changes
+    if: ${{ needs.changes.outputs.client == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -19,7 +37,6 @@ jobs:
 
       - name: Build Frontend
         working-directory: ./client
-        # Add your production API URL so Vite builds it into the static files
         env:
           VITE_BACKEND_URL: https://ethiovinapi.senaycreatives.com
         run: |
@@ -36,6 +53,8 @@ jobs:
           server-dir: /public_html/ethiovin/
 
   deploy-backend:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
