@@ -11,6 +11,7 @@ const app = express();
 // 1. Allowed Origins (Strictly NO trailing slashes)
 const allowedOrigins = [
   "https://ethiovin.senaycreatives.com",
+  "https://ethiovinapi.senaycreatives.com/api/vin/decode",
   "http://localhost:5173", // For local Vite frontend testing
   "http://localhost:3000", // For other local frontend setups
 ];
